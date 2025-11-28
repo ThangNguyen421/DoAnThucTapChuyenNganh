@@ -3,7 +3,7 @@
 
 // PHẦN CẤU HÌNH (WAMPP/XAMPP MẶC ĐỊNH)
 $host = 'localhost';
-$db   = 'gundam_doan'; // Tên DB bạn vừa tạo
+$db   = 'gundam_store'; // Tên DB bạn vừa tạo
 $user = 'root';       // User mặc định của XAMPP/WAMPP
 $pass = '';           // Mật khẩu mặc định là rỗng
 

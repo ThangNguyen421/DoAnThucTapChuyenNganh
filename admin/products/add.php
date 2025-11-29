@@ -1,10 +1,21 @@
 <?php
 // Tên file: admin/products/add.php
-require_once '../check_admin.php'; // 1. Bảo vệ trang
-require_once '../../core/database.php';
-require_once '../../core/functions.php'; // 2. Bao gồm hàm xử lý upload
-require_once '../../models/ProductModel.php';
+$rootPath = __DIR__ . '/../..'; 
 
+// 1. Bảo vệ trang (Đi từ products/ qua admin/ đến check_admin.php)
+// __DIR__ . '/../check_admin.php'
+require_once __DIR__ . '/../check_admin.php'; 
+
+// 2. Bao gồm database.php (Đi từ products/ qua admin/ ra gốc dự án, rồi vào core/)
+require_once $rootPath . '/core/database.php';
+
+// 3. Bao gồm functions.php (Hàm upload file)
+require_once $rootPath . '/core/functions.php';
+
+// 4. Bao gồm ProductModel.php
+require_once $rootPath . '/models/ProductModel.php';
+
+// Khởi tạo Model
 $productModel = new ProductModel($pdo);
 
 // Lấy danh sách danh mục để đổ vào dropdown

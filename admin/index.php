@@ -9,7 +9,7 @@ require_once __DIR__ . '/../core/database.php';
 
 // Lưu ý: Đường dẫn logout đã được sửa lại (từ admin/ ra public/logout.php)
 // Cần lùi 2 cấp (../..) để ra thư mục gốc, rồi vào public/
-$logoutPath = '../../public/logout.php'; 
+$logoutPath = '../core/public/logout.php'; 
 
 // Đây là trang Dashboard Admin.
 // Biến Session đã có: $_SESSION['user_fullname'], $_SESSION['user_id']

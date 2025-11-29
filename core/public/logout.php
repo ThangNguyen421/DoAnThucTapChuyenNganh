@@ -10,6 +10,6 @@ $_SESSION = array();
 session_destroy();
 
 // Chuyển hướng về trang đăng nhập
-header('Location: ../views/auth/login.php');
+header('Location: ../../views/auth/login.php');
 exit;
 ?>

@@ -96,6 +96,7 @@ class ProductModel {
             return false;
         }
     }
+
     
     // ==========================================================
     //                        PHẦN 3: QUẢN LÝ ẢNH PHỤ
@@ -122,6 +123,49 @@ class ProductModel {
         }
         return true;
     }
+
+
+/**
+     * Xóa sản phẩm theo MaSanPham
+     * @param int $productId MaSanPham cần xóa
+     * @return array|bool Dữ liệu sản phẩm (để xóa ảnh) hoặc FALSE nếu thất bại
+     */
+    public function deleteProduct(int $productId) {
+        $this->pdo->beginTransaction();
+        
+        try {
+            // 1. Lấy thông tin ảnh chính trước khi xóa (để xóa file)
+            $sqlSelect = "SELECT URLAnhChinh FROM SanPham WHERE MaSanPham = ?";
+            $stmtSelect = $this->pdo->prepare($sqlSelect);
+            $stmtSelect->execute([$productId]);
+            $productInfo = $stmtSelect->fetch();
+
+            if (!$productInfo) {
+                $this->pdo->rollBack();
+                return false; // Không tìm thấy sản phẩm
+            }
+            
+            // 2. Xóa tất cả ảnh phụ liên quan (AnhSanPham)
+            $sqlDeleteImages = "DELETE FROM AnhSanPham WHERE MaSanPham = ?";
+            $stmtDeleteImages = $this->pdo->prepare($sqlDeleteImages);
+            $stmtDeleteImages->execute([$productId]);
+            
+            // 3. Xóa sản phẩm khỏi bảng SanPham
+            $sqlDeleteProduct = "DELETE FROM SanPham WHERE MaSanPham = ?";
+            $stmtDeleteProduct = $this->pdo->prepare($sqlDeleteProduct);
+            $stmtDeleteProduct->execute([$productId]);
+            
+            $this->pdo->commit();
+            return $productInfo; // Trả về thông tin ảnh để xóa file vật lý
+            
+        } catch (\PDOException $e) {
+            $this->pdo->rollBack();
+            // error_log("Lỗi xóa sản phẩm: " . $e->getMessage()); 
+            return false;
+        }
+    }
+
+    
     
     // ... Các hàm getProductById, updateProduct, deleteProduct sẽ được thêm sau ...
 }

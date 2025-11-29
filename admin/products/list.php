@@ -1,10 +1,10 @@
 <?php
 // Tên file: admin/products/list.php
-$rootPath = __DIR__ . '/../..'; 
+$rootPath = __DIR__ . '/../..';
 
 // 1. Bảo vệ trang (Đi từ products/ qua admin/ đến check_admin.php)
 // __DIR__ . '/../check_admin.php'
-require_once __DIR__ . '/../check_admin.php'; 
+require_once __DIR__ . '/../check_admin.php';
 
 // 2. Bao gồm database.php (Đi từ products/ qua admin/ ra gốc dự án, rồi vào core/)
 require_once $rootPath . '/core/database.php';
@@ -25,11 +25,15 @@ $message = $_GET['msg'] ?? '';
 
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <title>Danh Sách Sản phẩm</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    </head>
+</head>
+
+
+
 <body>
     <div class="container-fluid">
         <div class="row">
@@ -65,24 +69,24 @@ $message = $_GET['msg'] ?? '';
                             </tr>
                         <?php else: ?>
                             <?php foreach ($products as $p): ?>
-                            <tr>
-                                <td><?php echo $p['MaSanPham']; ?></td>
-                                <td>
-                                    <img src="../../public<?php echo htmlspecialchars($p['URLAnhChinh']); ?>" 
-                                         alt="<?php echo htmlspecialchars($p['TenSanPham']); ?>" 
-                                         style="width: 50px; height: 50px; object-fit: cover;">
-                                </td>
-                                <td><?php echo htmlspecialchars($p['TenSanPham']); ?></td>
-                                <td><?php echo htmlspecialchars($p['TenDanhMuc']); ?></td>
-                                <td><?php echo number_format($p['GiaBan'], 0, ',', '.'); ?> VNĐ</td>
-                                <td><?php echo $p['TonKho']; ?></td>
-                                <td><?php echo $p['TrangThai']; ?></td>
-                                <td><?php echo date('d/m/Y', strtotime($p['NgayTao'])); ?></td>
-                                <td>
-                                    <a href="edit.php?id=<?php echo $p['MaSanPham']; ?>" class="btn btn-sm btn-warning">Sửa</a>
-                                    <button class="btn btn-sm btn-danger" onclick="confirmDelete(<?php echo $p['MaSanPham']; ?>)">Xóa</button>
-                                </td>
-                            </tr>
+                                <tr>
+                                    <td><?php echo $p['MaSanPham']; ?></td>
+                                    <td>
+                                        <img src="../../public<?php echo htmlspecialchars($p['URLAnhChinh']); ?>"
+                                            alt="<?php echo htmlspecialchars($p['TenSanPham']); ?>"
+                                            style="width: 50px; height: 50px; object-fit: cover;">
+                                    </td>
+                                    <td><?php echo htmlspecialchars($p['TenSanPham']); ?></td>
+                                    <td><?php echo htmlspecialchars($p['TenDanhMuc']); ?></td>
+                                    <td><?php echo number_format($p['GiaBan'], 0, ',', '.'); ?> VNĐ</td>
+                                    <td><?php echo $p['TonKho']; ?></td>
+                                    <td><?php echo $p['TrangThai']; ?></td>
+                                    <td><?php echo date('d/m/Y', strtotime($p['NgayTao'])); ?></td>
+                                    <td>
+                                        <a href="edit.php?id=<?php echo $p['MaSanPham']; ?>" class="btn btn-sm btn-warning">Sửa</a>
+                                        <button class="btn btn-sm btn-danger" onclick="confirmDelete(<?php echo $p['MaSanPham']; ?>)">Xóa</button>
+                                    </td>
+                                </tr>
                             <?php endforeach; ?>
                         <?php endif; ?>
                     </tbody>
@@ -90,14 +94,21 @@ $message = $_GET['msg'] ?? '';
             </main>
         </div>
     </div>
-    
+    <form id="delete-form" method="POST" action="delete.php" style="display:none;">
+        <input type="hidden" name="id" id="delete-id">
+        <input type="hidden" name="action" value="delete">
+    </form>
     <script>
         function confirmDelete(id) {
             if (confirm('Bạn có chắc chắn muốn xóa sản phẩm ID ' + id + ' này không?')) {
-                // Tạm thời chuyển hướng để dễ debug, sau này dùng form POST
-                window.location.href = 'delete.php?id=' + id;
+                // Gán ID sản phẩm vào input ẩn
+                document.getElementById('delete-id').value = id;
+
+                // Gửi form bằng phương thức POST
+                document.getElementById('delete-form').submit();
             }
         }
     </script>
 </body>
+
 </html>

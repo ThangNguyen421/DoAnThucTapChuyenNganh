@@ -4,9 +4,12 @@
 // Bước 1: Áp dụng lớp bảo vệ
 require_once 'check_admin.php';
 
-// Bao gồm các file logic cần thiết (ví dụ: database.php)
-// (Lưu ý: Bạn có thể cần điều chỉnh đường dẫn ../../)
+// Bao gồm các file logic cần thiết
 require_once __DIR__ . '/../core/database.php';
+
+// Lưu ý: Đường dẫn logout đã được sửa lại (từ admin/ ra public/logout.php)
+// Cần lùi 2 cấp (../..) để ra thư mục gốc, rồi vào public/
+$logoutPath = '../../public/logout.php'; 
 
 // Đây là trang Dashboard Admin.
 // Biến Session đã có: $_SESSION['user_fullname'], $_SESSION['user_id']
@@ -19,26 +22,66 @@ require_once __DIR__ . '/../core/database.php';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Admin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .sidebar {
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 100;
+            padding: 48px 0 0;
+            box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
+        }
+        .sidebar-sticky {
+            position: relative;
+            top: 0;
+            height: calc(100vh - 48px);
+            padding-top: .5rem;
+            overflow-x: hidden;
+            overflow-y: auto; 
+        }
+    </style>
 </head>
 
 <body>
+    <header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
+        <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3 fs-6" href="index.php">Admin Panel</a>
+        <div class="navbar-nav">
+            <div class="nav-item text-nowrap">
+                <a class="nav-link px-3" href="<?php echo $logoutPath; ?>">Đăng xuất</a>
+            </div>
+        </div>
+    </header>
+
     <div class="container-fluid">
         <div class="row">
             <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
-                <div class="position-sticky pt-3">
+                <div class="position-sticky pt-3 sidebar-sticky">
                     <ul class="nav flex-column">
                         <li class="nav-item"><a class="nav-link active" href="index.php">Dashboard</a></li>
-                        <li class="nav-item"><a class="nav-link" href="products/list.php">Quản lý Sản phẩm</a></li>
+                        
+                        <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                            <span>Quản lý Sản phẩm</span>
+                        </h6>
+                        <li class="nav-item"><a class="nav-link" href="products/list.php">Danh sách Sản phẩm</a></li>
+                        <li class="nav-item"><a class="nav-link" href="products/add.php">Thêm Sản phẩm</a></li>
+                        
+                        <li class="nav-item"><a class="nav-link" href="categories/add.php">Thêm Danh mục</a></li> 
+                        
+                        <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                            <span>Quản lý Khác</span>
+                        </h6>
                         <li class="nav-item"><a class="nav-link" href="orders/list.php">Quản lý Đơn hàng</a></li>
                         <li class="nav-item"><a class="nav-link" href="reports/sales_report.php">Báo cáo & Thống kê</a></li>
                     </ul>
+
                     <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
                         <span>Tài khoản</span>
                     </h6>
                     <ul class="nav flex-column mb-2">
-                        <li class="nav-item"><a class="nav-link" href="#">Xin chào, <?php echo htmlspecialchars($_SESSION['user_fullname']); ?></a></li>
+                        <li class="nav-item"><span class="nav-link text-primary">Xin chào, <?php echo htmlspecialchars($_SESSION['user_fullname']); ?></span></li>
                         <li class="nav-item">
-                            <a class="nav-link" href="../../core/public/logout.php">Đăng xuất</a>
+                            <a class="nav-link" href="<?php echo $logoutPath; ?>">Đăng xuất</a>
                         </li>
                     </ul>
                 </div>

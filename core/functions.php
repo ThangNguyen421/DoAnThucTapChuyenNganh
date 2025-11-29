@@ -1,11 +1,11 @@
 <?php
-// Thêm vào file core/functions.php (hoặc tạo file nếu chưa có)
+// Tên file: core/functions.php
 
 /**
- * Xử lý tải lên tệp tin và lưu vào thư mục đích an toàn.
+ * Xử lý tải lên tệp tin và lưu vào thư mục đích an toàn (Dùng kiểm tra đuôi mở rộng thay vì finfo).
  *
  * @param array $fileInfo Thông tin file từ $_FILES['ten_input_file']
- * @param string $targetDir Đường dẫn tuyệt đối đến thư mục lưu trữ (ví dụ: __DIR__ . '/../public/assets/images/products/')
+ * @param string $targetDir Đường dẫn tuyệt đối đến thư mục lưu trữ 
  * @param array $allowedTypes Mảng các MIME type được phép (ví dụ: ['image/jpeg', 'image/png'])
  * @param int $maxSize Kích thước tối đa cho phép (byte)
  * @return string|bool Tên file mới (ví dụ: 'sanpham_12345.jpg') hoặc FALSE nếu thất bại
@@ -17,31 +17,42 @@ function handleFileUpload(array $fileInfo, string $targetDir, array $allowedType
 
     // 1. Kiểm tra kích thước file
     if ($fileInfo['size'] > $maxSize) {
-        // error_log("Lỗi: Kích thước file vượt quá giới hạn.");
         return false;
     }
-
-    // 2. Kiểm tra MIME Type thực tế (quan trọng cho bảo mật)
-    $finfo = finfo_open(FILEINFO_MIME_TYPE);
-    $mimeType = finfo_file($finfo, $fileInfo['tmp_name']);
-    finfo_close($finfo);
-
-    if (!in_array($mimeType, $allowedTypes)) {
-        // error_log("Lỗi: Loại file không được phép.");
-        return false;
+    
+    // ----------------------------------------------------------------------
+    // 2. KIỂM TRA MIME TYPE (THAY THẾ PHƯƠNG PHÁP finfo_open() BẰNG ĐUÔI FILE)
+    // LƯU Ý: Phương pháp này kém bảo mật hơn nhưng giải quyết được lỗi WAMPP hiện tại.
+    $validExtensions = [
+        'jpg'  => 'image/jpeg',
+        'jpeg' => 'image/jpeg',
+        'png'  => 'image/png',
+        'gif'  => 'image/gif'
+    ];
+    
+    $extension = pathinfo($fileInfo['name'], PATHINFO_EXTENSION);
+    $extension = strtolower($extension);
+    
+    $fileMimeType = $validExtensions[$extension] ?? null;
+    
+    // Kiểm tra: Đuôi file có hợp lệ VÀ MIME type tương ứng có trong $allowedTypes không
+    if (!in_array($fileMimeType, $allowedTypes)) {
+        return false; 
     }
+    // ----------------------------------------------------------------------
 
     // 3. Tạo tên file mới duy nhất
-    $extension = pathinfo($fileInfo['name'], PATHINFO_EXTENSION);
     $newFileName = uniqid('gundam_') . '_' . time() . '.' . $extension;
     $targetPath = $targetDir . $newFileName;
 
     // 4. Di chuyển file từ thư mục tạm thời đến thư mục đích
     if (!move_uploaded_file($fileInfo['tmp_name'], $targetPath)) {
-        // error_log("Lỗi: Không thể di chuyển file.");
         return false;
     }
 
     // Trả về tên file đã được lưu
     return $newFileName;
 }
+
+// ... Có thể thêm các hàm khác vào đây
+?>

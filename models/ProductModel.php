@@ -223,5 +223,26 @@ class ProductModel
         return $stmt->execute($values);
     }
 
+    /**
+     * Lấy sản phẩm để hiển thị trên trang chủ
+     * Chỉ lấy sản phẩm có TrangThai = 'active'
+     * @param int $limit Số lượng sản phẩm muốn lấy
+     * @return array
+     */
+    public function getProductsForHomepage(int $limit)
+    {
+        $sql = "SELECT MaSanPham, TenSanPham, GiaBan, URLAnhChinh 
+                FROM SanPham 
+                WHERE TrangThai = 'active' 
+                ORDER BY NgayTao DESC 
+                LIMIT ?";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->bindValue(1, $limit, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->fetchAll();
+    }
+
     // ... Các hàm getProductById, updateProduct, deleteProduct sẽ được thêm sau ...
 }

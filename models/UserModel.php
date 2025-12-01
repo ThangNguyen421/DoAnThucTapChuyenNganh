@@ -44,9 +44,6 @@ class UserModel {
             return $this->pdo->lastInsertId(); 
             
         } catch (\PDOException $e) {
-            // Ghi log lỗi (nên dùng error_log trong môi trường production)
-            // error_log("Lỗi đăng ký người dùng: " . $e->getMessage());
-            
             // Lỗi phổ biến là trùng Email (UNIQUE constraint)
             return false;
         }
@@ -80,7 +77,6 @@ class UserModel {
             return false; // Sai email hoặc mật khẩu
             
         } catch (\PDOException $e) {
-            // error_log("Lỗi đăng nhập: " . $e->getMessage());
             return false;
         }
     }
@@ -96,7 +92,6 @@ class UserModel {
             $stmt->execute([':id' => $userId]);
         } catch (\PDOException $e) {
             // Ghi log nếu cập nhật không thành công nhưng không ngăn luồng đăng nhập
-            // error_log("Lỗi cập nhật LastLogin: " . $e->getMessage());
         }
     }
 
@@ -122,7 +117,50 @@ class UserModel {
         }
     }
 
-    // Các hàm CRUD khác cho quản trị viên (ví dụ: updateUser, deleteUser, getAllUsers) 
-    // sẽ được thêm vào đây sau.
+    // =================================================================
+    // CÁC HÀM QUẢN TRỊ VIÊN (ADMIN PANEL)
+    // =================================================================
+    
+    /**
+     * Lấy danh sách tất cả người dùng (Admin và Customer)
+     * @return array Danh sách người dùng
+     */
+    public function getAllUsers() {
+        $sql = "SELECT MaNguoiDung, HoTen, Email, DienThoai, DiaChi, VaiTro, NgayTao 
+                FROM NguoiDung 
+                ORDER BY NgayTao DESC";
+        $stmt = $this->pdo->query($sql);
+        return $stmt->fetchAll();
+    }
+
+    /**
+     * Cập nhật vai trò người dùng (Ví dụ: từ 'customer' sang 'admin')
+     * @param int $userId MaNguoiDung
+     * @param string $newRole Vai trò mới ('customer' hoặc 'admin')
+     * @return bool
+     */
+    public function updateRole(int $userId, string $newRole) {
+        // Đảm bảo chỉ cho phép cập nhật vai trò hợp lệ
+        $newRole = strtolower($newRole);
+        if ($newRole !== 'customer' && $newRole !== 'admin') {
+            return false;
+        }
+
+        $sql = "UPDATE NguoiDung SET VaiTro = ? WHERE MaNguoiDung = ?";
+        $stmt = $this->pdo->prepare($sql);
+        return $stmt->execute([$newRole, $userId]);
+    }
+    
+    /**
+     * Xóa người dùng khỏi database
+     * Lưu ý: Trong thực tế, bạn nên cập nhật trạng thái thay vì xóa vĩnh viễn
+     * @param int $userId MaNguoiDung
+     * @return bool
+     */
+    public function deleteUser(int $userId) {
+        $sql = "DELETE FROM NguoiDung WHERE MaNguoiDung = ?"; 
+        $stmt = $this->pdo->prepare($sql);
+        return $stmt->execute([$userId]);
+    }
 }
 ?>
